@@ -12,7 +12,7 @@ const imgList = [
 let selectedWord; // Sträng: ett av orden valt av en slumpgenerator från arrayen ovan
 
 let guesses = 0; // Number: håller antalet gissningar som gjorts
-let guessesLeft = 6;
+let guessedLetterCount = 0;
 let hangmanImg; // Sträng: sökväg till bild som kommer visas (och ändras) vid fel svar. t.ex. `/images/h1.png`
 
 let msgHolderEl = document.querySelector("#message"); // DOM-nod: Ger meddelande när spelet är över
@@ -27,30 +27,80 @@ startGameBtnEl.addEventListener("click", initiateGame);
 
 letterButtonContainerEl.addEventListener("click", guessLetter);
 
+// Funktion som ropas vid vinst eller förlust, gör olika saker beroende tillståndet
+function gameWasWon() {
+  informUser("YOU WON");
+  deactivate();
+}
+
+function gameWasLost() {
+  informUser("GAME OVER");
+  deactivate();
+}
+
+//function createButton(text) {
+//  let myButton = document.createElement("button");
+//  myButton.innerText = text;
+//  myButton.class = "btn btn--stripe";
+//  return myButton;
+//}
+//Jobba på det här senare om det finns tid. Lägg till en knapp för hints
+
+function checkGameState(lastGuessCorrect) {
+  //kolla om förlust föreligger
+  //game over när användaren har slut på liv
+  //game over när:
+  //hangmanImg är på näst sista OCH användaren då gissar fel
+  //stämmer src på hangmanImg överrens med strängen nedan
+  //"images/h5.png"
+  if (hangmanImgEl.src.slice(-6) === "h6.png" && !lastGuessCorrect) {
+    informUser("GAME OVER");
+  }
+  if (lastGuessCorrect && selectedWord.length === guessedLetterCount) {
+    gameWasWon();
+  }
+}
+
+//skriv en funktion som skickar meddelande till användaren
+function informUser(message) {
+  //skriv ut meddelandet message på rätt ställe
+  //skriv ut meddelandet inuti elementet msgHolderEl
+  msgHolderEl.innerText = message;
+}
+
 // Funktion som körs när du trycker på bokstäverna och gissar bokstav
 function guessLetter(e) {
-  // om anv ej klickat på en knapp, returna
+  let lastGuessCorrect;
   if (e.target.tagName !== "BUTTON") {
     return;
   }
-  console.log(e.target.value);
+  //console.log(e.target.value);
   let guessedLetter = e.target.value;
+  //deactivateLetter(guessedLetter);
+  //'string text ${expression} string text'
+  //let buttonClicked = document.querySelector('button[value="${guessedLetter}]')
   // öka guesses med 1
+  e.target.disabled = true;
 
   // (kolla om guesses är för högt?)
 
   // undersök om bokstaven (guessedLetter) finns i selectedWord
 
   const indexOfFirst = selectedWord.indexOf(guessedLetter);
-  console.log("first occurence at " + indexOfFirst);
+  //console.log("first occurence at " + indexOfFirst);
   if (indexOfFirst < 0) {
     // spelaren gissade FEL!
+    lastGuessCorrect = false;
     guesses = guesses + 1;
     setHangmanImg(guesses);
+    checkGameState(lastGuessCorrect);
     return;
   } else {
     // bokstav HITTAD!
+    lastGuessCorrect = true;
     letterBoxEls[indexOfFirst].firstElementChild.value = guessedLetter;
+    guessedLetterCount++;
+    checkGameState(lastGuessCorrect);
   }
   // vad händer om det finns fler instanser av tecknet?
   const indexOfSecond = selectedWord.indexOf(guessedLetter, indexOfFirst + 1);
@@ -59,9 +109,11 @@ function guessLetter(e) {
   } else {
     // bokstav HITTAD!
     letterBoxEls[indexOfSecond].firstElementChild.value = guessedLetter;
+    guessedLetterCount++;
   }
   // om ja : sätt in tecknet i den tomma rutan som överrensstämmer med bokstavens position i ordet
-  console.log("second occurence at " + indexOfSecond);
+  //console.log("second occurence at " + indexOfSecond);
+  checkGameState(lastGuessCorrect);
   // om nej: gåt nåt annat
 }
 
@@ -113,6 +165,19 @@ function deactivate() {
   }
 }
 
+function deactivateLetter(letter) {
+  for (let i = 0; i < letterButtonEls.length; i++) {
+    //console.log("index: " + i)
+    //console.log("element: ");
+    //console.log(letterButtonEls[i])
+    if (letter === letterBoxEls[i].value) {
+      letterButtonEls[i].disabled = true;
+    }
+  }
+}
+
+removeLB();
+deactivate();
 // Funktion som startar spelet vid knapptryckning, och då tillkallas andra funktioner
 function initiateGame() {
   // sätta upp spelet
@@ -124,15 +189,15 @@ function initiateGame() {
   // sätta hangmanImg-variablen till images/h0.png (klar)
   // sätt img-taggens src property till hangmanImg (klar)
   guesses = 0;
+  guessedLetterCount = 0;
   selectedWord = randomWord(wordList).toUpperCase();
   let wordLength = selectedWord.length;
   activate();
   removeLB();
   generateLB(wordLength);
   setHangmanImg(0);
+  informUser("");
 }
-
-// Funktion som ropas vid vinst eller förlust, gör olika saker beroende tillståndet
 
 /* // vcreate a variable and assign it element main from DOM
  
