@@ -206,8 +206,3 @@ function initiateGame() {
   informUser("");
 }
 
-/* // vcreate a variable and assign it element main from DOM
- 
-const myvar = document.querySelector('main');
-let myButtonContainer = document.querySelector('#letterButtons')
- */
