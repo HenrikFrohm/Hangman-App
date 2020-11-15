@@ -45,14 +45,6 @@ function gameWasLost() {
   deactivate();
 }
 
-//function createButton(text) {
-//  let myButton = document.createElement("button");
-//  myButton.innerText = text;
-//  myButton.class = "btn btn--stripe";
-//  return myButton;
-//}
-//Jobba på det här senare om det finns tid. Lägg till en knapp för hints
-
 function checkGameState(lastGuessCorrect) {
   //kolla om förlust föreligger
   //game over när användaren har slut på liv
