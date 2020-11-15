@@ -1,4 +1,11 @@
-const wordList = ["VSCode", "Krille", "Javascript", "Kaffe", "Te", "Vatten"]; // Array: med spelets alla ord
+const wordList = [
+  "Henrik",
+  "Funktion",
+  "Javascript",
+  "Variabel",
+  "Backend",
+  "Algoritm",
+]; // Array: med spelets alla ord
 const imgList = [
   "images/h0.png",
   "images/h1.png",
